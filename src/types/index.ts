@@ -1,4 +1,4 @@
-export type Unit = 'kg' | 'pc' | 'bundle' | 'tali' | 'dozen' | 'liter'
+export type Unit = 'kg' | 'pc' | 'bundle' | 'tali' | 'dozen' | 'liter' | 'balot'
 export type PaymentMethod = 'cash' | 'utang'
 export type DiscountType = 'percent' | 'fixed'
 
