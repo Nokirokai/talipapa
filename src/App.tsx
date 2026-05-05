@@ -36,13 +36,7 @@ function AppContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [userEmail, setUserEmail] = useState<string | null>(() => localStorage.getItem('talipapa-demo-user'))
   const [userId, setUserId] = useState<string | null>(null)
-  const [showWelcome, setShowWelcome] = useState(() => !sessionStorage.getItem('talipapa-welcomed'))
   const query = useQueryClient()
-
-  const closeWelcome = () => {
-    sessionStorage.setItem('talipapa-welcomed', 'true')
-    setShowWelcome(false)
-  }
 
   useEffect(() => {
     if (!hasSupabaseConfig || !supabase) return
@@ -189,34 +183,6 @@ function AppContent() {
         </button>
       </nav>
 
-      {/* Welcome Notification Popup */}
-      <Modal 
-        open={showWelcome && !!userEmail} 
-        onClose={closeWelcome}
-        title="Welcome"
-        className="max-w-sm bg-[#2a1001]/95 border-white/10 backdrop-blur-3xl p-0 overflow-hidden rounded-[40px]"
-      >
-        <div className="relative p-8 text-center">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-gradient-to-b from-amber-400/20 to-transparent pointer-events-none" />
-          <div className="relative z-10">
-            <div className="h-24 w-24 rounded-[32px] bg-amber-400 mx-auto flex items-center justify-center shadow-clay mb-6 animate-bounce">
-              <ShoppingCart size={48} className="text-slate-950" />
-            </div>
-            <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">Mabuhay!</h2>
-            <p className="text-white/60 font-bold mb-8 leading-relaxed">
-              Handa na ang iyong Talipapa POS.<br/>
-              Sama-sama nating palaguin<br/>
-              ang iyong negosyo!
-            </p>
-            <Button 
-              onClick={closeWelcome}
-              className="w-full h-14 rounded-2xl bg-amber-400 text-slate-950 font-black uppercase tracking-widest text-sm shadow-clay active:scale-95 transition-all"
-            >
-              MAGSIMULA NA
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   )
 }
