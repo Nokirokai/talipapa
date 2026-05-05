@@ -1,0 +1,17 @@
+{
+  "name": "J&R Talipapa POS",
+  "short_name": "Talipapa",
+  "description": "Digital POS for local market stalls",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2a1001",
+  "theme_color": "#fbbf24",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
