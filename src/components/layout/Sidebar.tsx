@@ -21,7 +21,7 @@ interface SidebarProps {
 
 export function Sidebar({ path, onNavigate, onLogout, email }: SidebarProps) {
   return (
-    <aside className="hidden h-screen w-64 shrink-0 border-r border-white/15 bg-white/10 p-3 shadow-glass backdrop-blur-xl md:flex md:flex-col print:hidden xl:w-72 xl:p-4">
+    <aside className="hidden h-screen w-64 shrink-0 border-r border-white/15 bg-white/10 p-6 pt-12 shadow-glass backdrop-blur-xl md:flex md:flex-col print:hidden xl:w-72 xl:p-8 xl:pt-16">
       <Logo />
       <nav className="mt-6 space-y-1.5">
         {nav.map((item) => {
