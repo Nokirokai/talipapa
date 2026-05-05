@@ -78,7 +78,7 @@ export function POSPage({ cashierId, cashierName }: { cashierId?: string | null;
 
   return (
     <div className="grid min-h-screen flex-1 grid-cols-1 gap-4 overflow-hidden p-4 lg:grid-cols-[minmax(0,3fr)_minmax(360px,2fr)] print:block">
-      <section className="min-h-0 overflow-hidden rounded-[32px] border border-white/10 bg-white/5 shadow-glass backdrop-blur-xl print:hidden">
+      <section className="min-h-0 overflow-hidden rounded-[24px] md:rounded-[32px] border border-white/10 bg-white/5 shadow-glass backdrop-blur-xl print:hidden">
         <div className="border-b border-white/10 p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -119,13 +119,13 @@ export function POSPage({ cashierId, cashierName }: { cashierId?: string | null;
             ))}
           </div>
         </div>
-        <div className="h-[calc(100vh-188px)] overflow-auto p-6 custom-scrollbar">
+        <div className="h-[calc(100vh-188px)] overflow-auto p-3 md:p-6 custom-scrollbar">
           {isLoading ? (
-            <div className="grid grid-cols-2 gap-6 xl:grid-cols-3 2xl:grid-cols-4">
-              {Array.from({ length: 8 }).map((_, index) => <Skeleton key={index} className="h-60 rounded-[32px]" />)}
+            <div className="grid grid-cols-2 gap-3 md:gap-6 xl:grid-cols-3 2xl:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, index) => <Skeleton key={index} className="h-48 md:h-60 rounded-[24px] md:rounded-[32px]" />)}
             </div>
           ) : filteredProducts.length ? (
-            <div className="grid grid-cols-2 gap-6 xl:grid-cols-3 2xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 md:gap-6 xl:grid-cols-3 2xl:grid-cols-4">
               {filteredProducts.map((product) => <ProductCard key={product.id} product={product} onAdd={cart.addItem} />)}
             </div>
           ) : (
@@ -137,7 +137,7 @@ export function POSPage({ cashierId, cashierName }: { cashierId?: string | null;
         </div>
       </section>
 
-      <aside className="flex min-h-0 flex-col rounded-[32px] border border-white/15 bg-white/10 shadow-glass backdrop-blur-xl print:hidden overflow-hidden">
+      <aside className="flex min-h-0 flex-col rounded-[24px] md:rounded-[32px] border border-white/15 bg-white/10 shadow-glass backdrop-blur-xl print:hidden overflow-hidden pb-32 md:pb-0">
         {/* Today's Quick Pulse Section */}
         <div className="p-4 bg-gradient-to-br from-amber-500/10 to-transparent border-b border-white/10">
           <div className="flex items-center justify-between mb-3">
@@ -212,7 +212,7 @@ export function POSPage({ cashierId, cashierName }: { cashierId?: string | null;
             />
           )}
 
-          <div className="space-y-3 rounded-[32px] bg-slate-950/40 p-6 border border-white/5">
+          <div className="space-y-2 md:space-y-3 rounded-2xl md:rounded-3xl bg-slate-950/40 p-4 md:p-6 border border-white/5">
             <div className="flex justify-between text-[11px] font-black uppercase text-white/30 tracking-widest">
               <span>Subtotal</span>
               <span>{formatPeso(totals.subtotal)}</span>
