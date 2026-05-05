@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  background: #0F172A;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+select option {
+  background: #0F172A;
+  color: #FFF8F0;
+}
+
+.bg-white\/8 {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .receipt {
+    display: block;
+    width: 76mm;
+    min-height: auto;
+    color: black;
+  }
+}
