@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
-import { BarChart3, Package, Settings, ShoppingCart, Warehouse } from 'lucide-react'
+import { BarChart3, LogOut, Package, Settings, ShoppingCart, TrendingUp, Warehouse } from 'lucide-react'
 import { AuthPage } from './pages/AuthPage'
 import { InventoryPage } from './pages/InventoryPage'
 import { POSPage } from './pages/POSPage'
 import { ProductsPage } from './pages/ProductsPage'
 import { ReportsPage } from './pages/ReportsPage'
 import { SettingsPage } from './pages/SettingsPage'
+import { PriceMonitoringPage } from './pages/PriceMonitoringPage'
 import { Sidebar } from './components/layout/Sidebar'
 import { hasSupabaseConfig, supabase } from './lib/supabase'
 import { cn } from './lib/utils'
@@ -17,6 +18,7 @@ const queryClient = new QueryClient()
 const mobileNav = [
   { path: '/', icon: ShoppingCart, label: 'POS' },
   { path: '/products', icon: Package, label: 'Products' },
+  { path: '/price-monitoring', icon: TrendingUp, label: 'Price' },
   { path: '/inventory', icon: Warehouse, label: 'Inventory' },
   { path: '/reports', icon: BarChart3, label: 'Reports' },
   { path: '/settings', icon: Settings, label: 'Settings' },
@@ -73,6 +75,7 @@ function AppContent() {
 
   const page = useMemo(() => {
     if (path === '/products') return <ProductsPage />
+    if (path === '/price-monitoring') return <PriceMonitoringPage />
     if (path === '/inventory') return <InventoryPage />
     if (path === '/reports') return <ReportsPage />
     if (path === '/settings') return <SettingsPage />
@@ -96,16 +99,20 @@ function AppContent() {
         <Sidebar path={path} onNavigate={navigate} onLogout={logout} email={userEmail} />
         {page}
       </div>
-      <nav className="fixed bottom-3 left-3 right-3 z-40 grid grid-cols-5 rounded-3xl border border-white/15 bg-slate-950/50 p-1.5 shadow-glass backdrop-blur-xl md:hidden print:hidden">
+      <nav className="fixed bottom-3 left-3 right-3 z-40 grid grid-cols-7 gap-1 rounded-3xl border border-white/15 bg-slate-950/50 p-1.5 shadow-glass backdrop-blur-xl md:hidden print:hidden">
         {mobileNav.map((item) => {
           const Icon = item.icon
           return (
             <button key={item.path} onClick={() => navigate(item.path)} className={cn('grid place-items-center gap-0.5 rounded-2xl py-1.5 text-[10px] font-bold text-white/60', path === item.path && 'bg-amber-300/20 text-amber-100')}>
               <Icon size={18} />
-              {item.label}
+              <span className="truncate w-full text-center">{item.label}</span>
             </button>
           )
         })}
+        <button onClick={logout} className="grid place-items-center gap-0.5 rounded-2xl py-1.5 text-[10px] font-bold text-white/60 hover:bg-rose-500/20 hover:text-rose-200">
+          <LogOut size={18} />
+          Logout
+        </button>
       </nav>
     </div>
   )

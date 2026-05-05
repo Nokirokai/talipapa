@@ -1,10 +1,11 @@
-import { BarChart3, LogOut, Package, Settings, ShoppingCart, Warehouse } from 'lucide-react'
+import { BarChart3, LogOut, Package, Settings, ShoppingCart, TrendingUp, Warehouse } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Logo } from './Logo'
 
 const nav = [
   { path: '/', label: 'POS', icon: ShoppingCart },
   { path: '/products', label: 'Products', icon: Package },
+  { path: '/price-monitoring', label: 'Price Monitoring', icon: TrendingUp },
   { path: '/inventory', label: 'Inventory', icon: Warehouse },
   { path: '/reports', label: 'Reports', icon: BarChart3 },
   { path: '/settings', label: 'Settings', icon: Settings },
