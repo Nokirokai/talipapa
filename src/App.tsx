@@ -11,8 +11,6 @@ import { SettingsPage } from './pages/SettingsPage'
 import { PriceMonitoringPage } from './pages/PriceMonitoringPage'
 import { UtangPage } from './pages/UtangPage'
 import { Sidebar } from './components/layout/Sidebar'
-import { Modal } from './components/ui/Modal'
-import { Button } from './components/ui/Button'
 import { hasSupabaseConfig, supabase } from './lib/supabase'
 import { cn } from './lib/utils'
 
