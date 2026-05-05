@@ -239,3 +239,4 @@ export function POSPage({ cashierId, cashierName }: { cashierId?: string | null;
     </div>
   )
 }
+  
