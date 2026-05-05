@@ -19,7 +19,8 @@ export function Button({ className, variant = 'clay', icon, children, ...props }
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex items-center justify-center gap-2 rounded-2xl text-sm font-bold transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50',
+        !children ? 'p-2' : 'px-4 py-2.5',
         variants[variant],
         className,
       )}

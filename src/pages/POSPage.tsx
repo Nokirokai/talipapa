@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ReceiptText, Search } from 'lucide-react'
+import { ReceiptText, Search, TrendingUp, Wallet, Coins, ShoppingCart } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { ProductCard } from '../components/pos/ProductCard'
 import { CartItem } from '../components/pos/CartItem'
 import { PaymentSelector } from '../components/pos/PaymentSelector'
 import { ReceiptModal } from '../components/pos/ReceiptModal'
 import { Button } from '../components/ui/Button'
-import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { Skeleton } from '../components/ui/Skeleton'
 import { useCategories } from '../hooks/useCategories'
 import { useProducts } from '../hooks/useProducts'
-import { useDiscounts, useProcessTransaction } from '../hooks/useTransactions'
+import { useProcessTransaction } from '../hooks/useTransactions'
+import { useDailyPulse } from '../hooks/useReports'
 import { useCartStore } from '../stores/cartStore'
 import { usePosStore } from '../stores/posStore'
 import type { Receipt } from '../types'
@@ -20,15 +20,14 @@ import { cn, computeCart, formatPeso } from '../lib/utils'
 export function POSPage({ cashierId, cashierName }: { cashierId?: string | null; cashierName?: string }) {
   const { data: products = [], isLoading } = useProducts()
   const { data: categories = [] } = useCategories()
-  const { data: discounts = [] } = useDiscounts()
   const { activeCategory, searchQuery, setActiveCategory, setSearchQuery } = usePosStore()
   const cart = useCartStore()
   const processTransaction = useProcessTransaction()
+  const pulse = useDailyPulse()
   const searchRef = useRef<HTMLInputElement>(null)
   const [receipt, setReceipt] = useState<Receipt | null>(null)
 
-  const selectedDiscount = cart.discount
-  const totals = computeCart(cart.items, selectedDiscount)
+  const totals = computeCart(cart.items, null)
   const change = cart.paymentMethod === 'cash' ? Math.max(0, cart.amountTendered - totals.total) : 0
 
   const filteredProducts = useMemo(() => {
@@ -51,10 +50,11 @@ export function POSPage({ cashierId, cashierName }: { cashierId?: string | null;
     }
     const result = await processTransaction.mutateAsync({
       items: cart.items,
-      discount: selectedDiscount,
+      discount: null,
       paymentMethod: cart.paymentMethod,
       amountTendered: cart.paymentMethod === 'cash' ? cart.amountTendered : totals.total,
       cashierId,
+      notes: cart.paymentMethod === 'utang' ? `${cart.customerName} | ${cart.customerDetails}` : null,
     })
     setReceipt(result)
     cart.clearCart()
@@ -74,32 +74,32 @@ export function POSPage({ cashierId, cashierName }: { cashierId?: string | null;
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  })
+  }, [])
 
   return (
     <div className="grid min-h-screen flex-1 grid-cols-1 gap-4 overflow-hidden p-4 lg:grid-cols-[minmax(0,3fr)_minmax(360px,2fr)] print:block">
-      <section className="min-h-0 overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-glass backdrop-blur-xl print:hidden">
-        <div className="border-b border-white/10 p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <section className="min-h-0 overflow-hidden rounded-[32px] border border-white/10 bg-white/5 shadow-glass backdrop-blur-xl print:hidden">
+        <div className="border-b border-white/10 p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="font-display text-2xl font-extrabold text-talipapa-white">Talipapa POS</h1>
-              <p className="text-sm font-semibold text-amber-100/65">Sariwang paninda, mabilis na bayad</p>
+              <h1 className="font-display text-3xl font-black text-talipapa-white tracking-tight">Tindahan POS</h1>
+              <p className="text-sm font-bold text-amber-200/50 uppercase tracking-widest">Sariwang paninda araw-araw</p>
             </div>
             <Input
               ref={searchRef}
               icon={<Search size={18} />}
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="F2 Hanapin produkto o barcode"
-              className="md:w-80"
+              placeholder="F2 Hanapin produkto..."
+              className="md:w-96 h-12"
             />
           </div>
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
+          <div className="mt-6 flex gap-2 overflow-x-auto pb-2 scrollbar-none">
             <button
               onClick={() => setActiveCategory('all')}
               className={cn(
-                'shrink-0 rounded-2xl px-4 py-2 text-sm font-extrabold shadow-clay transition active:shadow-clay-pressed',
-                activeCategory === 'all' ? 'bg-amber-300 text-slate-950' : 'bg-white/10 text-white/70',
+                'shrink-0 rounded-2xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all active:scale-95',
+                activeCategory === 'all' ? 'bg-amber-400 text-slate-950 shadow-clay' : 'bg-white/5 text-white/50 border border-white/5'
               )}
             >
               Lahat
@@ -109,93 +109,128 @@ export function POSPage({ cashierId, cashierName }: { cashierId?: string | null;
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
                 className={cn(
-                  'shrink-0 rounded-2xl px-4 py-2 text-sm font-extrabold shadow-clay transition active:shadow-clay-pressed',
-                  activeCategory === category.id ? 'text-slate-950' : 'bg-white/10 text-white/70',
+                  'shrink-0 rounded-2xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all active:scale-95 border',
+                  activeCategory === category.id ? 'text-slate-950 shadow-clay' : 'bg-white/5 text-white/50 border-white/5'
                 )}
-                style={activeCategory === category.id ? { backgroundColor: category.color_hex } : undefined}
+                style={activeCategory === category.id ? { backgroundColor: category.color_hex, borderColor: 'transparent' } : undefined}
               >
-                <span className="mr-1">{category.emoji}</span>{category.name}
+                <span className="mr-2">{category.emoji}</span>{category.name}
               </button>
             ))}
           </div>
         </div>
-        <div className="h-[calc(100vh-164px)] overflow-auto p-4">
+        <div className="h-[calc(100vh-188px)] overflow-auto p-6 custom-scrollbar">
           {isLoading ? (
-            <div className="grid grid-cols-2 gap-4 xl:grid-cols-3 2xl:grid-cols-4">
-              {Array.from({ length: 8 }).map((_, index) => <Skeleton key={index} className="h-56" />)}
+            <div className="grid grid-cols-2 gap-6 xl:grid-cols-3 2xl:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, index) => <Skeleton key={index} className="h-60 rounded-[32px]" />)}
             </div>
           ) : filteredProducts.length ? (
-            <div className="grid grid-cols-2 gap-4 xl:grid-cols-3 2xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-6 xl:grid-cols-3 2xl:grid-cols-4">
               {filteredProducts.map((product) => <ProductCard key={product.id} product={product} onAdd={cart.addItem} />)}
             </div>
           ) : (
-            <div className="grid h-full place-items-center text-center text-white/70">
-              <div>
-                <svg viewBox="0 0 160 120" className="mx-auto h-28 w-36">
-                  <path d="M26 70c28-34 65-34 108 0-43 31-80 31-108 0Z" fill="#0D9488" opacity=".9" />
-                  <circle cx="116" cy="69" r="5" fill="#FFF8F0" />
-                  <path d="M26 70 8 55v31z" fill="#FBBF24" />
-                </svg>
-                <div className="font-display text-xl font-bold">Walang nahanap</div>
-                <div className="text-sm">Subukan ang ibang category o search.</div>
-              </div>
+            <div className="flex flex-col items-center justify-center h-full opacity-10">
+              <Search size={80} className="mb-4" />
+              <p className="font-display text-2xl font-black uppercase tracking-[0.2em]">Walang Nahanap</p>
             </div>
           )}
         </div>
       </section>
 
-      <aside className="flex min-h-0 flex-col rounded-3xl border border-white/15 bg-white/10 shadow-glass backdrop-blur-xl print:hidden">
-        <div className="flex items-center justify-between border-b border-white/10 p-4">
-          <div>
-            <h2 className="font-display text-xl font-extrabold text-talipapa-white">Cart / Checkout</h2>
-            <p className="text-xs font-semibold text-white/50">F9 para i-proseso</p>
+      <aside className="flex min-h-0 flex-col rounded-[32px] border border-white/15 bg-white/10 shadow-glass backdrop-blur-xl print:hidden overflow-hidden">
+        {/* Today's Quick Pulse Section */}
+        <div className="p-4 bg-gradient-to-br from-amber-500/10 to-transparent border-b border-white/10">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-amber-200/50">
+              <TrendingUp size={12} /> Today's Pulse
+            </div>
+            <div className="text-[10px] font-bold text-white/20 uppercase">{pulse.count} txns</div>
           </div>
-          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-teal-300 text-slate-950 shadow-clay">
-            <ReceiptText size={22} />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-black/20 rounded-2xl p-3 border border-white/5">
+              <div className="flex items-center gap-2 text-[8px] font-black uppercase text-teal-400 mb-1"><Coins size={10} /> Cash</div>
+              <div className="text-sm font-black text-white">{formatPeso(pulse.cash)}</div>
+            </div>
+            <div className="bg-black/20 rounded-2xl p-3 border border-white/5">
+              <div className="flex items-center gap-2 text-[8px] font-black uppercase text-amber-400 mb-1"><Wallet size={10} /> Utang</div>
+              <div className="text-sm font-black text-white">{formatPeso(pulse.utang)}</div>
+            </div>
           </div>
         </div>
-        <div className="min-h-0 flex-1 space-y-3 overflow-auto p-4">
+
+        <div className="flex items-center justify-between p-6">
+          <div>
+            <h2 className="font-display text-2xl font-black text-talipapa-white uppercase tracking-tight">Kasalukuyang Cart</h2>
+            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">F9 I-Proseso ang Bayad</p>
+          </div>
+          <div className="h-12 w-12 grid place-items-center rounded-2xl bg-amber-400 text-slate-950 shadow-clay">
+            <ReceiptText size={24} />
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 space-y-3 overflow-auto p-6 custom-scrollbar">
           {cart.items.length ? cart.items.map((item) => (
             <CartItem key={item.product.id} item={item} onQty={(qty) => cart.setQty(item.product.id, qty)} onRemove={() => cart.removeItem(item.product.id)} />
           )) : (
-            <Card className="p-6 text-center text-white/60">
-              <svg viewBox="0 0 160 120" className="mx-auto h-24 w-32">
-                <path d="M22 30h116l-10 58H34z" fill="#F59E0B" opacity=".8" />
-                <path d="M48 88a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm58 0a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z" fill="#0D9488" />
-                <path d="M50 42h26v28H50zm36 0h26v28H86z" fill="#FFF8F0" opacity=".85" />
-              </svg>
-              <div className="font-display text-lg font-bold text-talipapa-white">Wala pang item</div>
-              <div className="text-sm">Magdagdag mula sa product grid.</div>
-            </Card>
+            <div className="flex flex-col items-center justify-center h-full opacity-10 py-10">
+              <ShoppingCart size={48} className="mb-4" />
+              <p className="text-xs font-black uppercase tracking-widest text-center">Walang laman ang cart</p>
+            </div>
           )}
         </div>
-        <div className="space-y-4 border-t border-white/10 p-4">
-          <select
-            className="h-12 w-full rounded-2xl border border-white/15 bg-slate-950/40 px-4 text-sm font-bold text-talipapa-white outline-none"
-            value={selectedDiscount?.id ?? ''}
-            onChange={(event) => cart.setDiscount(discounts.find((discount) => discount.id === event.target.value) ?? null)}
-          >
-            <option value="">Walang discount</option>
-            {discounts.filter((discount) => discount.value > 0).map((discount) => <option key={discount.id} value={discount.id}>{discount.name}</option>)}
-          </select>
+
+        <div className="space-y-4 border-t border-white/10 p-6 bg-slate-950/20 backdrop-blur-md">
+          {cart.paymentMethod === 'utang' && (
+            <div className="space-y-3 rounded-3xl bg-amber-500/10 p-4 border border-amber-500/20 animate-in fade-in slide-in-from-top-4">
+              <div className="text-[10px] font-black text-amber-200 uppercase tracking-[0.2em] mb-1">Impormasyon sa Utang</div>
+              <Input
+                placeholder="Pangalan ng tao"
+                value={cart.customerName}
+                onChange={(e) => cart.setCustomerName(e.target.value)}
+                className="h-10 bg-black/40"
+              />
+              <textarea
+                className="w-full rounded-2xl bg-black/40 p-3 text-xs font-bold text-white outline-none placeholder:text-white/20 focus:ring-2 focus:ring-amber-300/30 border border-white/5"
+                placeholder="Mga detalye (Hal. Kailan babayaran)"
+                rows={2}
+                value={cart.customerDetails}
+                onChange={(e) => cart.setCustomerDetails(e.target.value)}
+              />
+            </div>
+          )}
+          
           <PaymentSelector value={cart.paymentMethod} onChange={cart.setPaymentMethod} />
-          {cart.paymentMethod === 'cash' ? (
+          
+          {cart.paymentMethod === 'cash' && (
             <Input
               type="number"
               min="0"
               value={cart.amountTendered || ''}
               onChange={(event) => cart.setAmountTendered(Number(event.target.value))}
-              placeholder="Halagang natanggap"
+              placeholder="Halagang natanggap (Cash)"
+              className="h-12 text-lg"
             />
-          ) : null}
-          <div className="space-y-2 rounded-2xl bg-slate-950/30 p-4">
-            <div className="flex justify-between text-sm font-bold text-white/65"><span>Subtotal</span><span>{formatPeso(totals.subtotal)}</span></div>
-            <div className="flex justify-between text-sm font-bold text-white/65"><span>Discount</span><span>{formatPeso(totals.discountAmount)}</span></div>
-            <div className="flex justify-between font-display text-3xl font-extrabold text-amber-200"><span>TOTAL</span><span>{formatPeso(totals.total)}</span></div>
-            <div className="flex justify-between text-sm font-bold text-teal-200"><span>Sukli</span><span>{formatPeso(change)}</span></div>
+          )}
+
+          <div className="space-y-3 rounded-[32px] bg-slate-950/40 p-6 border border-white/5">
+            <div className="flex justify-between text-[11px] font-black uppercase text-white/30 tracking-widest">
+              <span>Subtotal</span>
+              <span>{formatPeso(totals.subtotal)}</span>
+            </div>
+            <div className="flex justify-between font-display text-4xl font-black text-amber-200 tracking-tighter">
+              <span>TOTAL</span>
+              <span>{formatPeso(totals.total)}</span>
+            </div>
+            {cart.paymentMethod === 'cash' && (
+              <div className="flex justify-between text-xs font-black text-teal-400 uppercase tracking-widest pt-2 border-t border-white/5">
+                <span>Sukli</span>
+                <span>{formatPeso(change)}</span>
+              </div>
+            )}
           </div>
-          <Button className="h-14 w-full text-base" disabled={processTransaction.isPending} onClick={handleProcess}>
-            {processTransaction.isPending ? 'Pinoproseso...' : 'I-PROSESO'}
+
+          <Button className="h-16 w-full text-lg rounded-3xl uppercase tracking-widest font-black" disabled={processTransaction.isPending || cart.items.length === 0} onClick={handleProcess}>
+            {processTransaction.isPending ? 'Pinoproseso...' : 'TAPUSIN ANG BAYAD'}
           </Button>
         </div>
       </aside>

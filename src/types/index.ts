@@ -52,6 +52,7 @@ export interface Transaction {
   amount_tendered: number
   change_amount: number
   payment_method: PaymentMethod
+  payment_status: 'paid' | 'unpaid'
   status: string
   notes: string | null
   created_at: string

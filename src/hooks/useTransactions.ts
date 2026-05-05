@@ -47,12 +47,14 @@ export const useProcessTransaction = () => {
       paymentMethod,
       amountTendered,
       cashierId,
+      notes,
     }: {
       items: CartItem[]
       discount?: Discount | null
       paymentMethod: PaymentMethod
       amountTendered: number
       cashierId?: string | null
+      notes?: string | null
     }): Promise<Receipt> => {
       const totals = computeCart(items, discount)
       const changeAmount = paymentMethod === 'cash' ? Math.max(0, amountTendered - totals.total) : 0
@@ -67,6 +69,7 @@ export const useProcessTransaction = () => {
           changeAmount,
           paymentMethod,
           cashierId,
+          notes,
         })
       }
 
@@ -80,6 +83,8 @@ export const useProcessTransaction = () => {
         amount_tendered: amountTendered,
         change_amount: changeAmount,
         payment_method: paymentMethod,
+        payment_status: paymentMethod === 'cash' ? 'paid' : 'unpaid',
+        notes: notes ?? null,
         status: 'completed',
       }
       const { data: transaction, error: txnError } = await supabase

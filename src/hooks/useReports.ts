@@ -46,3 +46,15 @@ export const useReports = () => {
     }
   }, [items.data, items.isLoading, products.data, products.isLoading, transactions.data, transactions.isLoading])
 }
+
+export const useDailyPulse = () => {
+  const { data: transactions = [] } = useTransactions()
+  return useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10)
+    const todayTxns = transactions.filter(t => t.created_at.startsWith(today))
+    const cash = todayTxns.filter(t => t.payment_method === 'cash').reduce((sum, t) => sum + t.total, 0)
+    const utang = todayTxns.filter(t => t.payment_method === 'utang' && t.payment_status === 'unpaid').reduce((sum, t) => sum + t.total, 0)
+    const total = todayTxns.reduce((sum, t) => sum + t.total, 0)
+    return { cash, utang, total, count: todayTxns.length }
+  }, [transactions])
+}

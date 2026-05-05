@@ -44,6 +44,14 @@ export const localDb = {
     write(PRODUCT_KEY, next)
     return next.find((row) => row.id === productId)
   },
+  upsertTransaction: async (transaction: Transaction) => {
+    const rows = read<Transaction[]>(TXN_KEY, transactions)
+    const next = rows.some((row) => row.id === transaction.id)
+      ? rows.map((row) => (row.id === transaction.id ? transaction : row))
+      : [transaction, ...rows]
+    write(TXN_KEY, next)
+    return transaction
+  },
   processTransaction: async (payload: {
     items: Array<{ product: Product; qty: number }>
     subtotal: number
@@ -54,6 +62,7 @@ export const localDb = {
     changeAmount: number
     paymentMethod: Transaction['payment_method']
     cashierId?: string | null
+    notes?: string | null
   }): Promise<Receipt> => {
     const productRows = read<Product[]>(PRODUCT_KEY, seededProducts)
     const transaction: Transaction = {
@@ -67,8 +76,9 @@ export const localDb = {
       amount_tendered: payload.amountTendered,
       change_amount: payload.changeAmount,
       payment_method: payload.paymentMethod,
+      payment_status: payload.paymentMethod === 'cash' ? 'paid' : 'unpaid',
       status: 'completed',
-      notes: null,
+      notes: payload.notes ?? null,
       created_at: new Date().toISOString(),
     }
     const items: TransactionItem[] = payload.items.map(({ product, qty }) => ({

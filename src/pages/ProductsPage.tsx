@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Edit3, ImagePlus, Plus, Power, Save, Trash2 } from 'lucide-react'
+import { Edit3, ImagePlus, Plus, Save, Trash2 } from 'lucide-react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
@@ -89,9 +89,9 @@ export function ProductsPage() {
                     <td className="px-3 py-2.5">{product.is_active ? 'Active' : 'Inactive'}</td>
                     <td className="px-3 py-2.5">
                       <div className="flex justify-end gap-1.5">
-                        <Button className="h-8 w-8 rounded-xl p-0" variant="glass" onClick={() => setEditing(product)}><Edit3 size={14} /></Button>
-                        <Button className="h-8 w-8 rounded-xl p-0" variant="glass" onClick={() => saveProduct.mutate({ ...product, is_active: !product.is_active })}><Power size={14} /></Button>
-                        <Button className="h-8 w-8 rounded-xl p-0" variant="danger" onClick={() => deleteProduct.mutate(product.id)}><Trash2 size={14} /></Button>
+                        <Button className="h-8 w-8" variant="glass" icon={<Edit3 size={14} strokeWidth={3} />} onClick={() => setEditing(product)} />
+                        <Button className="h-8 w-8" variant="glass" icon={<Save size={14} strokeWidth={3} />} onClick={() => saveProduct.mutate({ ...product, is_active: !product.is_active })} />
+                        <Button className="h-8 w-8" variant="danger" icon={<Trash2 size={14} strokeWidth={3} />} onClick={() => deleteProduct.mutate(product.id)} />
                       </div>
                     </td>
                   </tr>
@@ -154,7 +154,7 @@ export function ProductsPage() {
               }} />
             </label>
             <div className="flex justify-end gap-2 md:col-span-2">
-              <Button type="button" variant="glass" onClick={() => setEditing(null)}>Kanselahin</Button>
+              <Button type="button" variant="glass" icon={<Trash2 size={18} className="rotate-45" />} onClick={() => setEditing(null)}>Kanselahin</Button>
               <Button type="submit" icon={<Save size={18} />}>I-save</Button>
             </div>
           </form>
